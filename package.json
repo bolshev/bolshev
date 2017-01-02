@@ -17,5 +17,5 @@
     "deploy": "npm run build&&gh-pages -d build",
     "eject": "react-scripts eject"
   },
-  "homepage": "https://bolshev.github.io"
+  "homepage": "https://bolshev.github.io/react-course1"
 }
