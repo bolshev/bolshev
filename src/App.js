@@ -17,30 +17,32 @@ class App extends Component {
 
     handleSelectCategory(element, flag) {
         console.log("handleSelectCategory");
-        var state = this.state;
+        let state = this.state;
 
         state.tasks = [];
         state.categories.forEach((elem) => {
-            state.tasks = state.tasks.concat(this.checkChildren(state.tasks, elem, element, flag));
+            state.tasks = state.tasks.concat(this.checkChildren(elem, element, flag));
         });
         console.log(state.tasks);
         this.setState(state);
     }
 
-    checkChildren(tasks, elem, element, flag) {
+    checkChildren(elem, element, flag) {
+        let tasks = [];
         if (elem.key === element.key) {
             elem.selected = flag;
+        }
+
+        if (elem.children) {
+            elem.children.forEach((elem) => {
+                tasks = tasks.concat(this.checkChildren(elem, element, flag));
+            });
         }
 
         if (elem.selected) {
             tasks = tasks.concat(elem.tasks);
         }
 
-        if (elem.children) {
-            elem.children.forEach((elem) => {
-                tasks = tasks.concat(this.checkChildren(tasks, elem, element, flag));
-            });
-        }
         return tasks;
     }
 

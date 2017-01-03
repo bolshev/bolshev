@@ -5,7 +5,7 @@ class Category extends Component {
     constructor(props) {
         console.log(props);
         super(props);
-        props.data.selected = false;
+        props.data.selected = props.data.selected || false;
         this.state = props.data;
         this.isEdit = props.isEdit;
         this.onClick = props.onClick;
