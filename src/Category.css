@@ -1,0 +1,31 @@
+.Category {
+    text-align: left;
+}
+
+.Category-expand {
+    width: 10px;
+}
+.Category-content {
+    border: black 1px solid;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-flex-flow: row wrap;
+    justify-content: space-between;
+}
+
+.Category-title {
+    flex-grow: 10;
+    text-align: left;
+}
+
+.Category-sublist {
+    margin-left: 5px;
+}
+
+.Category-new {
+    text-align: left;
+}

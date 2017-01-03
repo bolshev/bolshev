@@ -1,0 +1,36 @@
+.Task {
+    border: solid black 1px;
+    padding: 10px;
+}
+
+.Task-new {
+    text-align: right;
+}
+
+.Task-content {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+
+    -webkit-flex-flow: row wrap;
+    justify-content: space-between;
+}
+
+.Task-title {
+    flex-grow: 10;
+    text-align: left;
+}
+
+.Task-buttons-right {
+    text-align: right !important;
+}
+
+.Task textarea {
+    width: 100%;
+}
+
+.Task div {
+    text-align: left;
+}
