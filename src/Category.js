@@ -29,7 +29,7 @@ class Category extends Component {
                         <span className="Category-title">
                         {this.state.title}
                     </span>
-                        <button>?</button>
+                        <button>Select</button>
                     </div>
                     {this.state.children ?
                         <div className="Category-sublist">
