@@ -29,3 +29,7 @@
 .Category-new {
     text-align: left;
 }
+
+.Category-selected {
+    background-color: burlywood;
+}

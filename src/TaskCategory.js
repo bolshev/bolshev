@@ -3,20 +3,15 @@ import './Category.css';
 
 class TaskCategory extends Component {
     constructor(props) {
-        console.log(props);
         super(props);
-        props.data.selected = props.data.selected || false;
         this.state = props.data;
-        this.isEdit = props.isEdit;
-        this.onClick = props.onClick;
+        this.selectedKey = props.selectedKey;
+        this.onClick = props.handleCategorySelect;
     }
 
     handleSelectCategory() {
-        console.log("handleSelectCategory");
-        let state = this.state;
-        state.selected = !this.state.selected;
-        this.setState(state);
-        this.onClick(this.state, state.selected);
+        console.log("TaskCategory:handleSelectCategory");
+        this.onClick(this.state);
     }
 
     render() {
@@ -28,13 +23,14 @@ class TaskCategory extends Component {
                     <span className="Category-title">
                         {this.state.title}
                     </span>
-                    <button>Select</button>
+                    {this.selectedKey !== this.state.key ? <button onClick={this.handleSelectCategory.bind(this)}>Select</button> : ""}
                 </div>
                 {this.state.children ?
                     <div className="Category-sublist">
-                        {this.state.children.map((elem) => <Category isEdit={this.isEdit}
-                                                                     key={elem.key}
-                                                                     data={elem}/>)}
+                        {this.state.children.map((elem) => <TaskCategory selectedKey={this.selectedKey}
+                                                                         handleCategorySelect={this.onClick}
+                                                                         key={elem.key}
+                                                                         data={elem}/>)}
                     </div> : ""
                 }
             </div>

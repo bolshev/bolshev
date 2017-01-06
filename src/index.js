@@ -16,8 +16,8 @@ ReactDOM.render(
         >
             <Route path="/" component={App}>
                 <IndexRoute component={MainView}/>
-                <Route path="task/:taskKey" component={EditTask}/>
-                <Route path="category/:categoryKey" component={EditCategory}/>
+                <Route path="task/(:taskKey)" component={EditTask}/>
+                <Route path="category/(:categoryKey)" component={EditCategory}/>
             </Route>
             <Route path="*" component={NotFound}/>
         </Router>

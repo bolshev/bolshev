@@ -2,50 +2,60 @@ import React, {Component} from 'react';
 import {browserHistory as history} from 'react-router';
 import './Task.css';
 import Server from './Server';
-import Category from './Category';
+import TaskCategory from './TaskCategory';
 
 class EditTask extends Component {
     componentWillMount() {
         this.server = new Server();
         let data = {};
-        data.task = this.server.getTaskByKey(this.props.routeParams.taskKey);
-        data.categories = this.server.getAllCategories();
-        data.editTask = true;
+        data.categories = this.server.getAllCategoriesWithTasks();
+        if (this.props.routeParams.taskKey) {
+            data.task = this.server.getTaskByKey(this.props.routeParams.taskKey);
+        } else {
+            data.task = {};
+        }
 
         this.setState(data);
-        this.category = this.server.getCategoryByKey(data.task.categoryKey);
     }
 
     handleChangeChecked() {
-        console.log("handleChangeChecked");
+        console.log("EditTask:handleChangeChecked");
         let state = this.state;
         state.task.isDone = !this.state.task.isDone;
         this.setState(state);
     }
 
-    handleChangeInput(e) {
-        console.log("handleChangeChecked");
+    handleChangeTitle(e) {
+        console.log("EditTask:handleChangeTitle");
         let state = this.state;
         state.task.title = e.target.value;
         this.setState(state);
     }
 
+    handleChangeDesc(e) {
+        console.log("EditTask:handleChangeDesc");
+        let state = this.state;
+        state.task.description = e.target.value;
+        this.setState(state);
+    }
+
     handleSaveClick() {
-        console.log("handleSaveClick");
-        this.server.addTaskToCategory(this.state.task, this.state.task.categoryKey, this.category.key);
+        console.log("EditTask:handleSaveClick");
+        this.server.updateTask(this.state.task);
         history.push("/");
     }
 
     handleCancelClick() {
-        console.log("handleCancelClick");
+        console.log("EditTask:handleCancelClick");
         history.push("/");
     }
 
     handleCategorySelect(category) {
-        console.log("handleCategorySelect");
+        console.log("EditTask:handleCategorySelect");
         let state = this.state;
-        this.category = category;
+        state.task.categoryKey = category.key;
         this.setState(state);
+        this.forceUpdate();
     }
 
     render() {
@@ -56,10 +66,10 @@ class EditTask extends Component {
                 </div>
                 <div className="App-content">
                     <div className="App-categories">
-                        {this.state.categories.map((elem) => <TaskCategory isEdit={this.state.editTask}
-                                                                       onSelect={this.handleCategorySelect.bind(this)}
-                                                                       key={elem.key}
-                                                                       data={elem}/>)}
+                        {this.state.categories.map((elem) => <TaskCategory selectedKey={this.state.task.categoryKey}
+                                                                           handleCategorySelect={this.handleCategorySelect.bind(this)}
+                                                                           key={elem.key}
+                                                                           data={elem}/>)}
                     </div>
                     <div className="App-tasks">
                         <div className="Task">
@@ -68,16 +78,17 @@ class EditTask extends Component {
                                 <button onClick={this.handleCancelClick.bind(this)}>Cancel</button>
                             </div>
                             <div>
-                                <input type="text" onChange={this.handleChangeInput.bind(this)}
-                                       value={this.state.task.title}/>
+                                <input type="text" onChange={this.handleChangeTitle.bind(this)}
+                                       value={this.state.task.title || "New task"}/>
                             </div>
                             <div>
                                 <input type="checkbox" onChange={this.handleChangeChecked.bind(this)}
-                                       checked={this.state.task.isDone}/>
+                                       checked={this.state.task.isDone || false}/>
                                 Done
                             </div>
                             <div>
-                                <textarea rows="30" value="Description"/>
+                                <textarea rows="30" value={this.state.task.description || "Description"}
+                                          onChange={this.handleChangeDesc.bind(this)}/>
                             </div>
                         </div>
                     </div>

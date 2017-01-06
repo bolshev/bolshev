@@ -9,23 +9,23 @@ import Task from './Task';
 
 class MainView extends Component {
     componentWillMount() {
-        let server = new Server();
-        let data = server.getAllData();
+        this.server = new Server();
+        let data = {categories: this.server.getAllCategoriesWithTasks()};
 
         data.tasks = [];
         this.setState(data);
     }
 
-    handleSelectCategory(element, flag) {
-        console.log("handleSelectCategory");
+    handleSelectCategory(category, flag) {
+        console.log("MainView:handleSelectCategory");
         let state = this.state;
 
         state.tasks = [];
         state.categories.forEach((elem) => {
-            state.tasks = state.tasks.concat(this.checkChildren(elem, element, flag));
+            state.tasks = state.tasks.concat(this.checkChildren(elem, category, flag));
         });
-        console.log(state.tasks);
         this.setState(state);
+        this.server.updateCategory(category)
     }
 
     checkChildren(elem, element, flag) {
@@ -48,17 +48,10 @@ class MainView extends Component {
     }
 
     handleTaskEditClick(element) {
-        console.log("handleTaskEditClick");
+        console.log("MainView:handleTaskEditClick");
         let state = this.state;
         state.editTask = true;
         state.task = element;
-        this.setState(state);
-    }
-
-    handleTaskEditClose() {
-        console.log("handleTaskEditClose");
-        let state = this.state;
-        state.editTask = false;
         this.setState(state);
     }
 
@@ -69,7 +62,7 @@ class MainView extends Component {
                     <h2>TO-DO List</h2>
                 </div>
                 <div className="App-progress">
-                    <Progress completed={75}/>
+                    <Progress completed={this.server.getProgress()}/>
                 </div>
                 <div className="App-content">
                     <div className="App-categories">
@@ -79,7 +72,6 @@ class MainView extends Component {
                         </div>
                         {this.state.categories.map((elem) => <Category
                             onClick={this.handleSelectCategory.bind(this)}
-                            isEdit={this.state.editTask}
                             key={elem.key}
                             data={elem}/>)}
                     </div>
