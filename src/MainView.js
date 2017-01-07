@@ -100,7 +100,7 @@ class MainView extends React.Component {
     handleShowIsDoneClick(e) {
         console.log("MainView:handleShowIsDoneClick");
         let state = this.state;
-        state.filter.showDone = e.target.checkbox;
+        state.filter.showDone = e.target.checked;
         this.server.saveFilter(state.filter);
         this.setState(state);
     }
@@ -127,7 +127,7 @@ class MainView extends React.Component {
                 <div className="App-header">
                     <h2>TO-DO List</h2>
                     <div className="App-filter">
-                        <input type="checkbox" checked={this.state.filter.showDone}
+                        <input type="checkbox" checked={this.state.filter.showDone} value={this.state.filter.showDone}
                                onChange={this.handleShowIsDoneClick.bind(this)}/> Show done
                         <input type="text" value={this.state.filter.fText} onChange={this.handleSearchChange.bind(this)}
                                placeholder="Search"/>

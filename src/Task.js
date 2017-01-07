@@ -7,6 +7,7 @@ class Task extends Component {
     constructor(props) {
         super(props);
         this.server = new Server();
+        this.showDone = props.filter.showDone;
         this.state = props.data;
     }
 
@@ -25,7 +26,7 @@ class Task extends Component {
     }
 
     render() {
-        if (this.props.filter.showDone && this.state.isDone) {
+        if ((!this.props.filter.showDone && this.state.isDone) || this.state.title.indexOf(this.props.filter.fText) === -1) {
             return (null);
         } else {
             return (
