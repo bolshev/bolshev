@@ -1,16 +1,15 @@
 import React, {Component} from 'react';
 import './Category.css';
 
-class TaskCategory extends Component {
+class SelectCategory extends Component {
     constructor(props) {
         super(props);
         this.state = props.data;
-        this.selectedKey = props.selectedKey;
         this.onClick = props.handleCategorySelect;
     }
 
     handleSelectCategory() {
-        console.log("TaskCategory:handleSelectCategory");
+        console.log("SelectCategory:handleSelectCategory");
         this.onClick(this.state);
     }
 
@@ -23,14 +22,15 @@ class TaskCategory extends Component {
                     <span className="Category-title">
                         {this.state.title}
                     </span>
-                    {this.selectedKey !== this.state.key ? <button onClick={this.handleSelectCategory.bind(this)}>Select</button> : ""}
+                    {this.props.selectedKey !== this.state.key ?
+                        <button onClick={this.handleSelectCategory.bind(this)}>Select</button> : ""}
                 </div>
                 {this.state.children ?
                     <div className="Category-sublist">
-                        {this.state.children.map((elem) => <TaskCategory selectedKey={this.selectedKey}
-                                                                         handleCategorySelect={this.onClick}
-                                                                         key={elem.key}
-                                                                         data={elem}/>)}
+                        {this.state.children.map((elem) => <SelectCategory selectedKey={this.props.selectedKey}
+                                                                           handleCategorySelect={this.onClick}
+                                                                           key={elem.key}
+                                                                           data={elem}/>)}
                     </div> : ""
                 }
             </div>
@@ -38,4 +38,4 @@ class TaskCategory extends Component {
     }
 }
 
-export default TaskCategory;
+export default SelectCategory;

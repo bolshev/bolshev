@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {browserHistory as history} from 'react-router';
 import './Task.css';
 import Server from './Server';
-import TaskCategory from './TaskCategory';
+import SelectCategory from './SelectCategory';
 
 class EditTask extends Component {
     componentWillMount() {
@@ -66,10 +66,10 @@ class EditTask extends Component {
                 </div>
                 <div className="App-content">
                     <div className="App-categories">
-                        {this.state.categories.map((elem) => <TaskCategory selectedKey={this.state.task.categoryKey}
-                                                                           handleCategorySelect={this.handleCategorySelect.bind(this)}
-                                                                           key={elem.key}
-                                                                           data={elem}/>)}
+                        {this.state.categories.map((elem) => <SelectCategory selectedKey={this.state.task.categoryKey}
+                                                                             handleCategorySelect={this.handleCategorySelect.bind(this)}
+                                                                             key={elem.key}
+                                                                             data={elem}/>)}
                     </div>
                     <div className="App-tasks">
                         <div className="Task">

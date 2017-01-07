@@ -1,19 +1,22 @@
 import React, {Component} from 'react';
 import './Task.css';
+import Server from './Server';
 import {browserHistory as history} from 'react-router';
 
 class Task extends Component {
     constructor(props) {
         super(props);
-        this.onClick = props.onClick;
+        this.server = new Server();
         this.state = props.data;
     }
 
-    handleChangeChecked() {
+    handleChangeChecked(e) {
         console.log("Task:handleChangeChecked");
         let state = this.state;
-        state.isDone = !this.state.isDone;
+        state.isDone = e.target.checked;
+        this.server.updateTask(state);
         this.setState(state);
+        this.props.taskCompleteClick(this.state);
     }
 
     handleEditClick() {

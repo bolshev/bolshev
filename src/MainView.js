@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 import Progress from 'react-progressbar';
 import './App.css';
 import './Category.css';
@@ -6,13 +6,15 @@ import './Task.css';
 import Server from './Server';
 import Category from './Category';
 import Task from './Task';
+import {browserHistory as history} from 'react-router';
 
-class MainView extends Component {
+class MainView extends React.Component {
     componentWillMount() {
         this.server = new Server();
         let data = {categories: this.server.getAllCategoriesWithTasks()};
 
         data.tasks = [];
+        data.progress = this.server.getProgress();
         this.setState(data);
     }
 
@@ -47,11 +49,28 @@ class MainView extends Component {
         return tasks;
     }
 
-    handleTaskEditClick(element) {
-        console.log("MainView:handleTaskEditClick");
+    handleTaskCompleteClick(task) {
+        console.log("MainView:handleTaskCompleteClick");
         let state = this.state;
-        state.editTask = true;
-        state.task = element;
+        state.progress = this.server.getProgress();
+        this.setState(state);
+    }
+
+    handleAddTaskClick() {
+        console.log("MainView:handleAddTaskClick");
+        history.push("/task/");
+    }
+
+    handleAddCategoryClick() {
+        console.log("MainView:handleAddTaskClick");
+        this.server.updateCategory({title: this.newCategoryName.value});
+        this.handleUpdateList();
+    }
+
+    handleUpdateList() {
+        console.log("MainView:handleUpdateList");
+        let state = this.state;
+        state.categories = this.server.getAllCategoriesWithTasks();
         this.setState(state);
     }
 
@@ -62,26 +81,27 @@ class MainView extends Component {
                     <h2>TO-DO List</h2>
                 </div>
                 <div className="App-progress">
-                    <Progress completed={this.server.getProgress()}/>
+                    <Progress completed={this.state.progress}/>
                 </div>
                 <div className="App-content">
                     <div className="App-categories">
                         <div className="Category-new">
-                            <input placeholder="Enter category title"/>
-                            <button>Add</button>
+                            <input type="text" ref={(input) => { this.newCategoryName = input; }} placeholder="Enter category title"/>
+                            <button onClick={this.handleAddCategoryClick.bind(this)}>Add</button>
                         </div>
                         {this.state.categories.map((elem) => <Category
-                            onClick={this.handleSelectCategory.bind(this)}
+                            handleSelectCategory={this.handleSelectCategory.bind(this)}
+                            handleUpdateList={this.handleUpdateList.bind(this)}
                             key={elem.key}
                             data={elem}/>)}
                     </div>
                     <div className="App-tasks">
                         <div className="Task-new">
                             <input placeholder="Enter task title"/>
-                            <button>Add</button>
+                            <button onClick={this.handleAddTaskClick.bind(this)}>Add</button>
                         </div>
                         {this.state.tasks.length > 0 ? this.state.tasks.map((elem) => <Task
-                                onClick={this.handleTaskEditClick.bind(this)}
+                                taskCompleteClick={this.handleTaskCompleteClick.bind(this)}
                                 key={elem.key}
                                 data={elem}/>) : <p>Please select a category</p>}
                     </div>

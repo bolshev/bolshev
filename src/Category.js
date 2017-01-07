@@ -1,12 +1,13 @@
-import React, {Component} from 'react';
+import React from 'react';
+import {browserHistory as history} from 'react-router';
 import './Category.css';
+import Server from './Server';
 
-class Category extends Component {
+class Category extends React.Component {
     constructor(props) {
         super(props);
         props.data.selected = props.data.selected || false;
         this.state = props.data;
-        this.onClick = props.onClick;
     }
 
     handleSelectCategory() {
@@ -14,7 +15,23 @@ class Category extends Component {
         let state = this.state;
         state.selected = !this.state.selected;
         this.setState(state);
-        this.onClick(this.state, state.selected);
+        this.props.handleSelectCategory(this.state, state.selected);
+    }
+
+    handleAddCategoryClick(e) {
+        console.log("Category:handleAddCategoryClick");
+        history.push("/category/" + this.state.key + "/add");
+    }
+
+    handleEditClick() {
+        console.log("Category:handleEditClick");
+        history.push("/category/" + this.state.key)
+    }
+
+    handleDeleteClick() {
+        console.log("Category:handleDeleteClick");
+        (new Server()).deleteCategory(this.state.key);
+        this.props.handleUpdateList();
     }
 
     render() {
@@ -26,16 +43,22 @@ class Category extends Component {
                     <span className="Category-title" onClick={this.handleSelectCategory.bind(this)}>
                             {this.state.title}
                         </span>
-                    <button>Edit</button>
-                    <button>Delete</button>
-                    <button>+</button>
+                    <button onClick={this.handleEditClick.bind(this)}>Edit</button>
+                    <button onClick={() => {
+                        if (confirm('Delete the category?')) {
+                            this.handleDeleteClick();
+                        }
+                    }}>Delete
+                    </button>
+                    <button onClick={this.handleAddCategoryClick.bind(this)}>+</button>
                 </div>
                 {this.state.children ?
                     <div className="Category-sublist">
-                        {this.state.children.map((elem) => <Category onClick={this.onClick}
-                                                                     isEdit={this.isEdit}
-                                                                     key={elem.key}
-                                                                     data={elem}/>)}
+                        {this.state.children.map((elem) => <Category
+                            handleSelectCategory={this.props.handleSelectCategory}
+                            handleUpdateList={this.props.handleUpdateList}
+                            key={elem.key}
+                            data={elem}/>)}
                     </div> : ""
                 }
             </div>

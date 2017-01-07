@@ -1,4 +1,4 @@
-.Category {
+.Category, .Category-edit {
     text-align: left;
 }
 
@@ -32,4 +32,16 @@
 
 .Category-selected {
     background-color: burlywood;
+}
+
+.Category-edit-buttons-right {
+    text-align: right !important;
+}
+
+.Category-edit textarea {
+    width: 100%;
+}
+
+.Category-edit div {
+    text-align: left;
 }
