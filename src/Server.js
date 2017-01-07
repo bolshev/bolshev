@@ -223,9 +223,7 @@ class Server {
         // eslint-disable-next-line
         for (let [k, cat] of Object.entries(this.data.categories)) {
             if (!cat.categoryKey) {
-                if (this.filter.selectedCategories.includes(cat.key)) {
-                    cat.selected = true;
-                }
+                cat.selected = this.filter.selectedCategories.includes(cat.key);
                 categories.push(cat);
             }
         }
@@ -237,9 +235,7 @@ class Server {
             // eslint-disable-next-line
             for (let [k, child] of Object.entries(this.data.categories)) {
                 if (child.categoryKey === parent.key) {
-                    if (this.filter.selectedCategories.includes(child.key)) {
-                        child.selected = true;
-                    }
+                    child.selected = this.filter.selectedCategories.includes(child.key);
                     parent.children.push(child);
                 }
             }
@@ -404,11 +400,14 @@ class Server {
                 selectedCategories: [],
                 fText: ""
             };
-        } else {
+        } else if (typeof filter === "string") {
             filter = JSON.parse(filter);
+        } else {
+            filter.selectedCategories = filter.selectedCategories.split(",");
         }
 
         this.filter = filter;
+        localStorage.setItem("filter", JSON.stringify(filter));
         return filter;
     }
 

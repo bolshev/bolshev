@@ -12,8 +12,8 @@ class MainView extends React.Component {
     componentWillMount() {
         this.server = new Server();
         let data = {
-            categories: this.server.getAllCategoriesWithTasks(),
-            filter: this.server.loadFilter(this.props.query)
+            filter: this.server.loadFilter(this.props.location.query),
+            categories: this.server.getAllCategoriesWithTasks()
         };
 
         data.tasks = this.checkSelected(data, {}, null);
@@ -158,7 +158,8 @@ class MainView extends React.Component {
                     </div>
                     <div className="App-tasks">
                         <div className="Task-new">
-                            <input placeholder="Enter task title" value={this.state.newTaskName} onChange={this.handleNewTaskChange.bind(this)}/>
+                            <input placeholder="Enter task title" value={this.state.newTaskName}
+                                   onChange={this.handleNewTaskChange.bind(this)}/>
                             <Link to={{pathname: '/task', query: {taskName: this.state.newTaskName}}}>Add</Link>
                         </div>
                         {this.state.tasks.length > 0 ? this.state.tasks.map((elem) => <Task
