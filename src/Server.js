@@ -404,6 +404,7 @@ class Server {
             filter = JSON.parse(filter);
         } else {
             filter.selectedCategories = filter.selectedCategories.split(",");
+            filter.showDone = (filter.showDone === "true");
         }
 
         this.filter = filter;
