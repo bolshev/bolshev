@@ -12,7 +12,7 @@ class EditTask extends Component {
         if (this.props.routeParams.taskKey) {
             data.task = this.server.getTaskByKey(this.props.routeParams.taskKey);
         } else {
-            data.task = {title: "New task"};
+            data.task = {title: this.props.location.query.taskName || "New task"};
         }
 
         this.setState(data);

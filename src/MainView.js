@@ -6,19 +6,20 @@ import './Task.css';
 import Server from './Server';
 import Category from './Category';
 import Task from './Task';
-import {browserHistory as history} from 'react-router';
+import {Link} from 'react-router';
 
 class MainView extends React.Component {
     componentWillMount() {
         this.server = new Server();
         let data = {
             categories: this.server.getAllCategoriesWithTasks(),
-            filter: this.server.loadFilter()
+            filter: this.server.loadFilter(this.props.query)
         };
 
         data.tasks = this.checkSelected(data, {}, null);
         data.progress = this.server.getProgress();
         this.setState(data);
+        this.server.saveFilter(data.filter, true);
     }
 
     handleSelectCategory(category, flag) {
@@ -79,11 +80,6 @@ class MainView extends React.Component {
         this.setState(state);
     }
 
-    handleAddTaskClick() {
-        console.log("MainView:handleAddTaskClick");
-        history.push("/task/");
-    }
-
     handleAddCategoryClick() {
         console.log("MainView:handleAddTaskClick");
         this.server.updateCategory({title: this.newCategoryName.value});
@@ -121,6 +117,14 @@ class MainView extends React.Component {
         this.setState(state);
     }
 
+    handleNewTaskChange(e) {
+        console.log("MainView:handleNewTaskChange");
+        let state = this.state;
+        state.newTaskName = e.target.value;
+        this.server.saveFilter(state.filter);
+        this.setState(state);
+    }
+
     render() {
         return (
             <div className="App">
@@ -154,8 +158,8 @@ class MainView extends React.Component {
                     </div>
                     <div className="App-tasks">
                         <div className="Task-new">
-                            <input placeholder="Enter task title"/>
-                            <button onClick={this.handleAddTaskClick.bind(this)}>Add</button>
+                            <input placeholder="Enter task title" value={this.state.newTaskName} onChange={this.handleNewTaskChange.bind(this)}/>
+                            <Link to={{pathname: '/task', query: {taskName: this.state.newTaskName}}}>Add</Link>
                         </div>
                         {this.state.tasks.length > 0 ? this.state.tasks.map((elem) => <Task
                                 taskCompleteClick={this.handleTaskCompleteClick.bind(this)}

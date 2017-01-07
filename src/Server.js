@@ -1,4 +1,5 @@
 // SERVER emulation start
+import {browserHistory as history} from 'react-router';
 
 class Server {
     constructor() {
@@ -222,7 +223,7 @@ class Server {
         // eslint-disable-next-line
         for (let [k, cat] of Object.entries(this.data.categories)) {
             if (!cat.categoryKey) {
-                if(this.filter.selectedCategories.includes(cat.key)) {
+                if (this.filter.selectedCategories.includes(cat.key)) {
                     cat.selected = true;
                 }
                 categories.push(cat);
@@ -236,7 +237,7 @@ class Server {
             // eslint-disable-next-line
             for (let [k, child] of Object.entries(this.data.categories)) {
                 if (child.categoryKey === parent.key) {
-                    if(this.filter.selectedCategories.includes(child.key)) {
+                    if (this.filter.selectedCategories.includes(child.key)) {
                         child.selected = true;
                     }
                     parent.children.push(child);
@@ -388,13 +389,15 @@ class Server {
         return parseInt((completed / Object.keys(this.data.categories).length) * 100, 10);
     }
 
-    saveFilter(filter) {
+    saveFilter(filter, isReplace) {
         this.filter = filter;
         localStorage.setItem("filter", JSON.stringify(filter));
+
+        isReplace ? history.replace("/" + this.getFilter()) : history.push("/" + this.getFilter());
     }
 
-    loadFilter() {
-        let filter = localStorage.getItem("filter");
+    loadFilter(query) {
+        let filter = query || localStorage.getItem("filter");
         if (!filter || filter === "undefined") {
             filter = {
                 showDone: false,
@@ -407,6 +410,16 @@ class Server {
 
         this.filter = filter;
         return filter;
+    }
+
+    getFilter() {
+        let query = "?showDone=" + this.filter.showDone + "&fText=" + this.filter.fText + "&selectedCategories=";
+        // eslint-disable-next-line
+        for (let cat of this.filter.selectedCategories) {
+            query = query + cat + ",";
+        }
+
+        return query.substr(0, query.length - 1);
     }
 }
 
