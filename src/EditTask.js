@@ -12,7 +12,7 @@ class EditTask extends Component {
         if (this.props.routeParams.taskKey) {
             data.task = this.server.getTaskByKey(this.props.routeParams.taskKey);
         } else {
-            data.task = {};
+            data.task = {title: "New task"};
         }
 
         this.setState(data);
@@ -41,8 +41,12 @@ class EditTask extends Component {
 
     handleSaveClick() {
         console.log("EditTask:handleSaveClick");
-        this.server.updateTask(this.state.task);
-        history.push("/");
+        if (!this.state.task.categoryKey) {
+            alert('Please select a category?')
+        } else {
+            this.server.updateTask(this.state.task);
+            history.push("/");
+        }
     }
 
     handleCancelClick() {

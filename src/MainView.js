@@ -11,9 +11,12 @@ import {browserHistory as history} from 'react-router';
 class MainView extends React.Component {
     componentWillMount() {
         this.server = new Server();
-        let data = {categories: this.server.getAllCategoriesWithTasks()};
+        let data = {
+            categories: this.server.getAllCategoriesWithTasks(),
+            filter: this.server.loadFilter()
+        };
 
-        data.tasks = [];
+        data.tasks = this.checkSelected(data, {}, null);
         data.progress = this.server.getProgress();
         this.setState(data);
     }
@@ -22,12 +25,30 @@ class MainView extends React.Component {
         console.log("MainView:handleSelectCategory");
         let state = this.state;
 
-        state.tasks = [];
-        state.categories.forEach((elem) => {
-            state.tasks = state.tasks.concat(this.checkChildren(elem, category, flag));
-        });
+        state.tasks = this.checkSelected(state, category, flag);
+
+        if (flag) {
+            state.filter.selectedCategories.push(category.key);
+        } else {
+            let index = state.filter.selectedCategories.indexOf(category.key);
+            if (index > -1) {
+                state.filter.selectedCategories.splice(index, 1);
+            }
+        }
+
+        this.server.saveFilter(state.filter);
         this.setState(state);
-        this.server.updateCategory(category)
+        this.server.updateCategory(category);
+    }
+
+    checkSelected(state, category, flag) {
+        let tasks = [];
+        state.categories.forEach((elem) => {
+            tasks = tasks.concat(this.checkChildren(elem, category, flag));
+        });
+        tasks.sort(this.server.sortByOrder);
+
+        return tasks;
     }
 
     checkChildren(elem, element, flag) {
@@ -45,6 +66,8 @@ class MainView extends React.Component {
                 tasks = tasks.concat(this.checkChildren(elem, element, flag));
             });
         }
+
+        tasks.sort(this.server.sortByOrder);
 
         return tasks;
     }
@@ -74,11 +97,42 @@ class MainView extends React.Component {
         this.setState(state);
     }
 
+    handleShowIsDoneClick(e) {
+        console.log("MainView:handleShowIsDoneClick");
+        let state = this.state;
+        state.filter.showDone = e.target.checkbox;
+        this.server.saveFilter(state.filter);
+        this.setState(state);
+    }
+
+    handleSearchChange(e) {
+        console.log("MainView:handleSearchChange");
+        let state = this.state;
+        state.filter.fText = e.target.value;
+        this.server.saveFilter(state.filter);
+        this.setState(state);
+    }
+
+    handleSearchClean() {
+        console.log("MainView:handleSearchClean");
+        let state = this.state;
+        state.filter.fText = "";
+        this.server.saveFilter(state.filter);
+        this.setState(state);
+    }
+
     render() {
         return (
             <div className="App">
                 <div className="App-header">
                     <h2>TO-DO List</h2>
+                    <div className="App-filter">
+                        <input type="checkbox" checked={this.state.filter.showDone}
+                               onChange={this.handleShowIsDoneClick.bind(this)}/> Show done
+                        <input type="text" value={this.state.filter.fText} onChange={this.handleSearchChange.bind(this)}
+                               placeholder="Search"/>
+                        <button onChange={this.handleSearchClean.bind(this)}>X</button>
+                    </div>
                 </div>
                 <div className="App-progress">
                     <Progress completed={this.state.progress}/>
@@ -86,12 +140,15 @@ class MainView extends React.Component {
                 <div className="App-content">
                     <div className="App-categories">
                         <div className="Category-new">
-                            <input type="text" ref={(input) => { this.newCategoryName = input; }} placeholder="Enter category title"/>
+                            <input type="text" ref={(input) => {
+                                this.newCategoryName = input;
+                            }} placeholder="Enter category title"/>
                             <button onClick={this.handleAddCategoryClick.bind(this)}>Add</button>
                         </div>
                         {this.state.categories.map((elem) => <Category
                             handleSelectCategory={this.handleSelectCategory.bind(this)}
                             handleUpdateList={this.handleUpdateList.bind(this)}
+                            filter={this.state.filter}
                             key={elem.key}
                             data={elem}/>)}
                     </div>
@@ -102,6 +159,7 @@ class MainView extends React.Component {
                         </div>
                         {this.state.tasks.length > 0 ? this.state.tasks.map((elem) => <Task
                                 taskCompleteClick={this.handleTaskCompleteClick.bind(this)}
+                                filter={this.state.filter}
                                 key={elem.key}
                                 data={elem}/>) : <p>Please select a category</p>}
                     </div>

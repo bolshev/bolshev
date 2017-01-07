@@ -25,15 +25,20 @@ class Task extends Component {
     }
 
     render() {
-        return (
-            <div className="Task">
-                <div className="Task-content">
-                    <input onChange={this.handleChangeChecked.bind(this)} type="checkbox" checked={this.state.isDone}/>
-                    <span className="Task-title">{this.state.title}</span>
-                    <button onClick={this.handleEditClick.bind(this)}>Edit</button>
+        if (this.props.filter.showDone && this.state.isDone) {
+            return (null);
+        } else {
+            return (
+                <div className="Task">
+                    <div className="Task-content">
+                        <input onChange={this.handleChangeChecked.bind(this)} type="checkbox"
+                               checked={this.state.isDone}/>
+                        <span className="Task-title">{this.state.title}</span>
+                        <button onClick={this.handleEditClick.bind(this)}>Edit</button>
+                    </div>
                 </div>
-            </div>
-        );
+            );
+        }
     }
 }
 

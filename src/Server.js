@@ -60,108 +60,126 @@ class Server {
                 categoryKey: "cat11",
                 title: "task 3",
                 key: "t3",
+                order: 1,
                 isDone: false
             },
             "t4": {
                 categoryKey: "cat11",
                 title: "task 4",
                 key: "t4",
+                order: 2,
                 isDone: false
             },
             "t5": {
                 categoryKey: "cat11",
                 title: "task 5",
                 key: "t5",
+                order: 3,
                 isDone: true
             },
             "t6": {
                 categoryKey: "cat12",
                 title: "task 6",
                 key: "t6",
+                order: 4,
                 isDone: true
             },
             "t7": {
                 categoryKey: "cat13",
                 title: "task 7",
                 key: "t7",
+                order: 5,
                 isDone: true
             },
             "t8": {
                 categoryKey: "cat13",
                 title: "task 8",
                 key: "t8",
+                order: 6,
                 isDone: false
             },
             "t9": {
                 categoryKey: "cat2",
                 title: "task 9",
                 key: "t9",
+                order: 7,
                 isDone: true
             },
             "t10": {
                 categoryKey: "cat2",
                 title: "task 10",
                 key: "t10",
+                order: 8,
                 isDone: false
             },
             "t12": {
                 categoryKey: "cat3",
                 title: "task 12",
                 key: "t12",
+                order: 9,
                 isDone: false
             },
             "t1": {
                 categoryKey: "cat1",
                 title: "task 1",
                 key: "t1",
+                order: 10,
                 isDone: true
             },
             "t13": {
                 categoryKey: "cat31",
                 title: "task 13",
                 key: "t13",
+                order: 11,
                 isDone: false
             },
             "t14": {
                 categoryKey: "cat31",
                 title: "task 14",
                 key: "t14",
+                order: 12,
                 isDone: true
             },
             "t2": {
                 categoryKey: "cat1",
                 title: "task 2",
                 key: "t2",
+                order: 14,
                 isDone: false
             },
             "t33": {
                 categoryKey: "cat1",
                 title: "task 33",
                 key: "t33",
+                order: 15,
                 isDone: true
             },
             "t15": {
                 categoryKey: "cat32",
                 title: "task 15",
                 key: "t15",
+                order: 13,
                 isDone: false
             },
             "t16": {
                 categoryKey: "cat32",
                 title: "task 16",
                 key: "t16",
+                order: 16,
                 isDone: true
             },
             "t17": {
                 categoryKey: "cat32",
                 title: "task 17",
                 key: "t17",
+                order: 17,
                 isDone: true
             },
             "t18": {
                 categoryKey: "cat32",
                 title: "task 18",
                 key: "t18",
+                order: 18,
                 isDone: false
             }
         }
@@ -191,55 +209,80 @@ class Server {
         return this.data;
     }
 
-    sortCategories(a, b) {
+    sortByOrder(a, b) {
         if (a.order > b.order) return 1;
         if (a.order < b.order) return -1;
     }
 
     getAllCategoriesWithTasks() {
         this.load();
+        this.loadFilter();
+
         let categories = [];
         // eslint-disable-next-line
         for (let [k, cat] of Object.entries(this.data.categories)) {
             if (!cat.categoryKey) {
+                if(this.filter.selectedCategories.includes(cat.key)) {
+                    cat.selected = true;
+                }
                 categories.push(cat);
             }
         }
 
-        categories.sort(this.sortCategories);
+        categories.sort(this.sortByOrder);
 
         categories.forEach((parent) => {
             parent.children = [];
             // eslint-disable-next-line
             for (let [k, child] of Object.entries(this.data.categories)) {
                 if (child.categoryKey === parent.key) {
+                    if(this.filter.selectedCategories.includes(child.key)) {
+                        child.selected = true;
+                    }
                     parent.children.push(child);
                 }
             }
 
-            parent.children.sort(this.sortCategories);
+            parent.children.sort(this.sortByOrder);
 
+            let isCompleted = true;
             parent.tasks = [];
             // eslint-disable-next-line
             for (let [k, task] of Object.entries(this.data.tasks)) {
                 if (task.categoryKey === parent.key) {
                     parent.tasks.push(task);
+                    if (!task.isDone) {
+                        isCompleted = false;
+                    }
                 }
             }
+
+            this.data.categories[parent.key].isCompleted = isCompleted;
         });
 
         categories.forEach((parent) => {
             parent.children.forEach((child) => {
+                let isCompleted = true;
                 child.tasks = [];
                 // eslint-disable-next-line
                 for (let [k, task] of Object.entries(this.data.tasks)) {
                     if (task.categoryKey === child.key) {
                         child.tasks.push(task);
+                        if (!task.isDone) {
+                            isCompleted = false;
+                        }
                     }
+                }
+
+                this.data.categories[child.key].isCompleted = isCompleted;
+
+                if (!isCompleted) {
+                    this.data.categories[parent.key].isCompleted = isCompleted;
                 }
             });
         });
 
+        this.save();
         return categories;
     }
 
@@ -257,9 +300,12 @@ class Server {
         this.load();
         if (!task.key) {
             task.key = "t" + this.getRandomTaskKey();
+            this.updateTasksOrder();
+            task.order = 1;
         }
         this.data.tasks[task.key] = task;
         this.save();
+        this.getAllCategoriesWithTasks();
     }
 
     getRandomInt() {
@@ -284,9 +330,15 @@ class Server {
         return num;
     }
 
-    updateOrder() {
+    updateCategoriesOrder() {
         for (let key of Object.keys(this.data.categories)) {
             this.data.categories[key].order++;
+        }
+    }
+
+    updateTasksOrder() {
+        for (let key of Object.keys(this.data.tasks)) {
+            this.data.tasks[key].order++;
         }
     }
 
@@ -294,15 +346,15 @@ class Server {
         this.load();
         if (!category.key) {
             category.key = "cat" + this.getRandomCategoryKey();
+            this.updateCategoriesOrder();
+            category.order = 1;
         }
-
-        this.updateOrder();
 
         category = {
             key: category.key,
             title: category.title,
-            categoryKey: category.categoryKey,
-            order: 1
+            isCompleted: category.isCompleted,
+            categoryKey: category.categoryKey
         };
 
         this.data.categories[category.key] = category;
@@ -314,7 +366,7 @@ class Server {
 
         // eslint-disable-next-line
         for (let [k, cat] of Object.entries(this.data.categories)) {
-            if(cat.categoryKey === key) {
+            if (cat.categoryKey === key) {
                 delete this.data.categories[k];
             }
         }
@@ -327,13 +379,34 @@ class Server {
         this.load();
         let completed = 0;
         // eslint-disable-next-line
-        for (let [k, task] of Object.entries(this.data.tasks)) {
-            if (task.isDone) {
+        for (let [k, cat] of Object.entries(this.data.categories)) {
+            if (cat.isCompleted) {
                 completed++;
             }
         }
 
-        return parseInt((completed / Object.keys(this.data.tasks).length) * 100, 10);
+        return parseInt((completed / Object.keys(this.data.categories).length) * 100, 10);
+    }
+
+    saveFilter(filter) {
+        this.filter = filter;
+        localStorage.setItem("filter", JSON.stringify(filter));
+    }
+
+    loadFilter() {
+        let filter = localStorage.getItem("filter");
+        if (!filter || filter === "undefined") {
+            filter = {
+                showDone: false,
+                selectedCategories: [],
+                fText: ""
+            };
+        } else {
+            filter = JSON.parse(filter);
+        }
+
+        this.filter = filter;
+        return filter;
     }
 }
 
