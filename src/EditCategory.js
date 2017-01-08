@@ -1,13 +1,14 @@
 import React from 'react';
 import {browserHistory as history} from 'react-router';
-import './Task.css';
+import './css/Task.css';
 import Server from './Server';
+import History from './History';
 
 class EditCategory extends React.Component {
     componentWillMount() {
-        this.server = new Server();
+        this.server = Server;
         let data = {};
-        data.categories = this.server.getAllCategoriesWithTasks();
+        data.categories = this.server.getAllCategories();
         if (this.props.routeParams.categoryKey && !this.props.routeParams.action) {
             data.category = this.server.getCategoryByKey(this.props.routeParams.categoryKey);
         } else {
@@ -42,6 +43,7 @@ class EditCategory extends React.Component {
     render() {
         return (
             <div className="App">
+                <History/>
                 <div className="App-header">
                     <h2>Edit {this.state.category.title}</h2>
                 </div>

@@ -1,16 +1,18 @@
 import React, {Component} from 'react';
 import {browserHistory as history} from 'react-router';
-import './Task.css';
+import './css/Task.css';
 import Server from './Server';
+import TaskStore from './flux/TaskStore';
+import TaskActions from './flux/Actions';
 import SelectCategory from './SelectCategory';
+import History from './History';
 
 class EditTask extends Component {
     componentWillMount() {
-        this.server = new Server();
         let data = {};
-        data.categories = this.server.getAllCategoriesWithTasks();
+        data.categories = Server.getAllCategories();
         if (this.props.routeParams.taskKey) {
-            data.task = this.server.getTaskByKey(this.props.routeParams.taskKey);
+            data.task = TaskStore.getTask(this.props.routeParams.taskKey);
         } else {
             data.task = {title: this.props.location.query.taskName || "New task"};
         }
@@ -44,14 +46,14 @@ class EditTask extends Component {
         if (!this.state.task.categoryKey) {
             alert('Please select a category?')
         } else {
-            this.server.updateTask(this.state.task);
+            TaskActions.updateTask(this.state.task);
             history.push("/");
         }
     }
 
     handleCancelClick() {
         console.log("EditTask:handleCancelClick");
-        history.push("/");
+        TaskActions.cancelEditTask();
     }
 
     handleCategorySelect(category) {
@@ -65,6 +67,7 @@ class EditTask extends Component {
     render() {
         return (
             <div className="App">
+                <History/>
                 <div className="App-header">
                     <h2>Edit {this.state.task.title}</h2>
                 </div>

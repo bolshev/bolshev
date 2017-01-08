@@ -1,12 +1,10 @@
-import React, {Component} from 'react';
-import './Task.css';
-import Server from './Server';
-import {browserHistory as history} from 'react-router';
+import React from 'react';
+import './css/Task.css';
+import TaskActions from './flux/Actions';
 
-class Task extends Component {
+class Task extends React.Component {
     constructor(props) {
         super(props);
-        this.server = new Server();
         this.showDone = props.filter.showDone;
         this.state = props.data;
     }
@@ -15,14 +13,13 @@ class Task extends Component {
         console.log("Task:handleChangeChecked");
         let state = this.state;
         state.isDone = e.target.checked;
-        this.server.updateTask(state);
+        TaskActions.toggleTask(state.key, state.isDone);
         this.setState(state);
-        this.props.taskCompleteClick(this.state);
     }
 
     handleEditClick() {
         console.log("Task:handleEditClick");
-        history.push('/task/' + this.state.key)
+        TaskActions.editTask(this.state.key);
     }
 
     render() {

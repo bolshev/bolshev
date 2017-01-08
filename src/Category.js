@@ -1,6 +1,6 @@
 import React from 'react';
 import {browserHistory as history} from 'react-router';
-import './Category.css';
+import './css/Category.css';
 import Server from './Server';
 
 class Category extends React.Component {
@@ -31,7 +31,7 @@ class Category extends React.Component {
 
     handleDeleteClick() {
         console.log("Category:handleDeleteClick");
-        (new Server()).deleteCategory(this.state.key);
+        Server.deleteCategory(this.state.key);
         this.props.handleUpdateList();
     }
 

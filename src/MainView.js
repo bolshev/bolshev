@@ -1,32 +1,51 @@
 import React from 'react';
 import Progress from 'react-progressbar';
-import './App.css';
-import './Category.css';
-import './Task.css';
+import './css/App.css';
+import './css/Category.css';
+import './css/Task.css';
+import TaskStore from './flux/TaskStore';
 import Server from './Server';
 import Category from './Category';
+import History from './History';
 import Task from './Task';
 import {Link} from 'react-router';
 
 class MainView extends React.Component {
     componentWillMount() {
-        this.server = new Server();
+        TaskStore.fetchTasks();
         let data = {
-            filter: this.server.loadFilter(this.props.location.query),
-            categories: this.server.getAllCategoriesWithTasks()
+            filter: Server.loadFilter(this.props.location.query),
+            categories: Server.getAllCategories()
         };
 
-        data.tasks = this.checkSelected(data, {}, null);
-        data.progress = this.server.getProgress();
+        data.tasks = [];
+        data.progress = Server.getProgress();
         this.setState(data);
-        this.server.saveFilter(data.filter, true);
+        Server.saveFilter(data.filter, true);
+    }
+
+    componentDidMount() {
+        let state = this.state;
+        state.tasks = this.filterTasksByCategories(TaskStore.getTasks());
+        this.setState(state);
+        TaskStore.subscribe(this.onChange.bind(this));
+    }
+
+    componentWillUnmount() {
+        TaskStore.unsubscribe(this.onChange);
+    }
+
+    onChange() {
+        console.log("MainView:onChange");
+        let state = this.state;
+        state.tasks = this.filterTasksByCategories(TaskStore.getTasks());
+        state.progress = Server.getProgress();
+        this.setState(state);
     }
 
     handleSelectCategory(category, flag) {
         console.log("MainView:handleSelectCategory");
         let state = this.state;
-
-        state.tasks = this.checkSelected(state, category, flag);
 
         if (flag) {
             state.filter.selectedCategories.push(category.key);
@@ -37,59 +56,30 @@ class MainView extends React.Component {
             }
         }
 
-        this.server.saveFilter(state.filter);
+        state.tasks = this.filterTasksByCategories(TaskStore.getTasks());
+
+        Server.saveFilter(state.filter);
         this.setState(state);
-        this.server.updateCategory(category);
+        Server.updateCategory(category);
     }
 
-    checkSelected(state, category, flag) {
-        let tasks = [];
-        state.categories.forEach((elem) => {
-            tasks = tasks.concat(this.checkChildren(elem, category, flag));
-        });
-        tasks.sort(this.server.sortByOrder);
-
+    filterTasksByCategories(loadedTasks) {
+        let tasks = Object.values(loadedTasks)
+            .filter((task) => this.state.filter.selectedCategories.includes(task.categoryKey), this);
+        tasks.sort(Server.sortByOrder);
         return tasks;
-    }
-
-    checkChildren(elem, element, flag) {
-        let tasks = [];
-        if (elem.key === element.key) {
-            elem.selected = flag;
-        }
-
-        if (elem.selected) {
-            tasks = tasks.concat(elem.tasks);
-        }
-
-        if (elem.children) {
-            elem.children.forEach((elem) => {
-                tasks = tasks.concat(this.checkChildren(elem, element, flag));
-            });
-        }
-
-        tasks.sort(this.server.sortByOrder);
-
-        return tasks;
-    }
-
-    handleTaskCompleteClick(task) {
-        console.log("MainView:handleTaskCompleteClick");
-        let state = this.state;
-        state.progress = this.server.getProgress();
-        this.setState(state);
     }
 
     handleAddCategoryClick() {
         console.log("MainView:handleAddTaskClick");
-        this.server.updateCategory({title: this.newCategoryName.value});
+        Server.updateCategory({title: this.newCategoryName.value});
         this.handleUpdateList();
     }
 
     handleUpdateList() {
         console.log("MainView:handleUpdateList");
         let state = this.state;
-        state.categories = this.server.getAllCategoriesWithTasks();
+        state.categories = Server.getAllCategories();
         this.setState(state);
     }
 
@@ -97,7 +87,7 @@ class MainView extends React.Component {
         console.log("MainView:handleShowIsDoneClick");
         let state = this.state;
         state.filter.showDone = e.target.checked;
-        this.server.saveFilter(state.filter);
+        Server.saveFilter(state.filter);
         this.setState(state);
     }
 
@@ -105,7 +95,7 @@ class MainView extends React.Component {
         console.log("MainView:handleSearchChange");
         let state = this.state;
         state.filter.fText = e.target.value;
-        this.server.saveFilter(state.filter);
+        Server.saveFilter(state.filter);
         this.setState(state);
     }
 
@@ -113,7 +103,7 @@ class MainView extends React.Component {
         console.log("MainView:handleSearchClean");
         let state = this.state;
         state.filter.fText = "";
-        this.server.saveFilter(state.filter);
+        Server.saveFilter(state.filter);
         this.setState(state);
     }
 
@@ -121,13 +111,14 @@ class MainView extends React.Component {
         console.log("MainView:handleNewTaskChange");
         let state = this.state;
         state.newTaskName = e.target.value;
-        this.server.saveFilter(state.filter);
+        Server.saveFilter(state.filter);
         this.setState(state);
     }
 
     render() {
         return (
             <div className="App">
+                <History/>
                 <div className="App-header">
                     <h2>TO-DO List</h2>
                     <div className="App-filter">
@@ -163,7 +154,6 @@ class MainView extends React.Component {
                             <Link to={{pathname: '/task', query: {taskName: this.state.newTaskName}}}>Add</Link>
                         </div>
                         {this.state.tasks.length > 0 ? this.state.tasks.map((elem) => <Task
-                                taskCompleteClick={this.handleTaskCompleteClick.bind(this)}
                                 filter={this.state.filter}
                                 key={elem.key}
                                 data={elem}/>) : <p>Please select a category</p>}

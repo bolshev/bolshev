@@ -198,16 +198,16 @@ class Server {
     }
 
     save() {
-        localStorage.setItem("data", JSON.stringify(this.data));
+        localStorage.setItem("data", JSON.stringify(this._data));
     }
 
     setData(data) {
-        this.data = data;
+        this._data = data;
     }
 
     getAllData() {
         this.load();
-        return this.data;
+        return this._data;
     }
 
     sortByOrder(a, b) {
@@ -215,13 +215,17 @@ class Server {
         if (a.order < b.order) return -1;
     }
 
-    getAllCategoriesWithTasks() {
+    getAllCategories() {
+        return this.getAllCategoriesWithTasks(false);
+    }
+
+    getAllCategoriesWithTasks(withTasks = true) {
         this.load();
         this.loadFilter();
 
         let categories = [];
         // eslint-disable-next-line
-        for (let [k, cat] of Object.entries(this.data.categories)) {
+        for (let [k, cat] of Object.entries(this._data.categories)) {
             if (!cat.categoryKey) {
                 cat.selected = this.filter.selectedCategories.includes(cat.key);
                 categories.push(cat);
@@ -233,7 +237,7 @@ class Server {
         categories.forEach((parent) => {
             parent.children = [];
             // eslint-disable-next-line
-            for (let [k, child] of Object.entries(this.data.categories)) {
+            for (let [k, child] of Object.entries(this._data.categories)) {
                 if (child.categoryKey === parent.key) {
                     child.selected = this.filter.selectedCategories.includes(child.key);
                     parent.children.push(child);
@@ -243,38 +247,38 @@ class Server {
             parent.children.sort(this.sortByOrder);
 
             let isCompleted = true;
-            parent.tasks = [];
+            if (withTasks) parent.tasks = [];
             // eslint-disable-next-line
-            for (let [k, task] of Object.entries(this.data.tasks)) {
+            for (let [k, task] of Object.entries(this._data.tasks)) {
                 if (task.categoryKey === parent.key) {
-                    parent.tasks.push(task);
+                    if (withTasks) parent.tasks.push(task);
                     if (!task.isDone) {
                         isCompleted = false;
                     }
                 }
             }
 
-            this.data.categories[parent.key].isCompleted = isCompleted;
+            this._data.categories[parent.key].isCompleted = isCompleted;
         });
 
         categories.forEach((parent) => {
             parent.children.forEach((child) => {
                 let isCompleted = true;
-                child.tasks = [];
+                if (withTasks) child.tasks = [];
                 // eslint-disable-next-line
-                for (let [k, task] of Object.entries(this.data.tasks)) {
+                for (let [k, task] of Object.entries(this._data.tasks)) {
                     if (task.categoryKey === child.key) {
-                        child.tasks.push(task);
+                        if (withTasks) child.tasks.push(task);
                         if (!task.isDone) {
                             isCompleted = false;
                         }
                     }
                 }
 
-                this.data.categories[child.key].isCompleted = isCompleted;
+                this._data.categories[child.key].isCompleted = isCompleted;
 
                 if (!isCompleted) {
-                    this.data.categories[parent.key].isCompleted = isCompleted;
+                    this._data.categories[parent.key].isCompleted = isCompleted;
                 }
             });
         });
@@ -285,12 +289,12 @@ class Server {
 
     getTaskByKey(key) {
         this.load();
-        return this.data.tasks[key];
+        return this._data.tasks[key];
     }
 
     getCategoryByKey(key) {
         this.load();
-        return this.data.categories[key];
+        return this._data.categories[key];
     }
 
     updateTask(task) {
@@ -300,9 +304,9 @@ class Server {
             this.updateTasksOrder();
             task.order = 1;
         }
-        this.data.tasks[task.key] = task;
+        this._data.tasks[task.key] = task;
         this.save();
-        this.getAllCategoriesWithTasks();
+        this.getAllCategories();
     }
 
     getRandomInt() {
@@ -312,7 +316,7 @@ class Server {
     getRandomTaskKey() {
         this.load();
         let num = this.getRandomInt();
-        if (this.data.tasks["t" + num]) {
+        if (this._data.tasks["t" + num]) {
             num = this.getRandomTaskKey();
         }
         return num;
@@ -321,21 +325,21 @@ class Server {
     getRandomCategoryKey() {
         this.load();
         let num = this.getRandomInt();
-        if (this.data.categories["cat" + num]) {
+        if (this._data.categories["cat" + num]) {
             num = this.getRandomTaskKey();
         }
         return num;
     }
 
     updateCategoriesOrder() {
-        for (let key of Object.keys(this.data.categories)) {
-            this.data.categories[key].order++;
+        for (let key of Object.keys(this._data.categories)) {
+            this._data.categories[key].order++;
         }
     }
 
     updateTasksOrder() {
-        for (let key of Object.keys(this.data.tasks)) {
-            this.data.tasks[key].order++;
+        for (let key of Object.keys(this._data.tasks)) {
+            this._data.tasks[key].order++;
         }
     }
 
@@ -354,7 +358,7 @@ class Server {
             categoryKey: category.categoryKey
         };
 
-        this.data.categories[category.key] = category;
+        this._data.categories[category.key] = category;
         this.save();
     }
 
@@ -362,13 +366,13 @@ class Server {
         this.load();
 
         // eslint-disable-next-line
-        for (let [k, cat] of Object.entries(this.data.categories)) {
+        for (let [k, cat] of Object.entries(this._data.categories)) {
             if (cat.categoryKey === key) {
-                delete this.data.categories[k];
+                delete this._data.categories[k];
             }
         }
 
-        delete this.data.categories[key];
+        delete this._data.categories[key];
         this.save();
     }
 
@@ -376,13 +380,13 @@ class Server {
         this.load();
         let completed = 0;
         // eslint-disable-next-line
-        for (let [k, cat] of Object.entries(this.data.categories)) {
+        for (let [k, cat] of Object.entries(this._data.categories)) {
             if (cat.isCompleted) {
                 completed++;
             }
         }
 
-        return parseInt((completed / Object.keys(this.data.categories).length) * 100, 10);
+        return parseInt((completed / Object.keys(this._data.categories).length) * 100, 10);
     }
 
     saveFilter(filter, isReplace) {
@@ -393,7 +397,7 @@ class Server {
     }
 
     loadFilter(query) {
-        let filter = query || localStorage.getItem("filter");
+        let filter = query && Object.keys(query).length !== 0 ? query : localStorage.getItem("filter");
         if (!filter || filter === "undefined") {
             filter = {
                 showDone: false,
@@ -403,8 +407,9 @@ class Server {
         } else if (typeof filter === "string") {
             filter = JSON.parse(filter);
         } else {
-            filter.selectedCategories = filter.selectedCategories.split(",");
+            filter.selectedCategories = filter.selectedCategories ? filter.selectedCategories.split(",") : [];
             filter.showDone = (filter.showDone === "true");
+            filter.fText = filter.fText || "";
         }
 
         this.filter = filter;
@@ -423,5 +428,5 @@ class Server {
     }
 }
 
-export default Server;
+export default new Server();
 // Server emulation end

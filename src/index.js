@@ -6,7 +6,7 @@ import EditTask from './EditTask';
 import EditCategory from './EditCategory';
 import MainView from './MainView';
 import NotFound from './NotFound';
-import './index.css';
+import './css/index.css';
 
 ReactDOM.render(
     (
