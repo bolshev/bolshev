@@ -1,6 +1,6 @@
 import EventEmitter from 'event-emitter';
 import Server from '../Server';
-import TaskActionTypes from './ActionsTypes';
+import TaskActionTypes from './TaskActionTypes';
 import TaskDispatcher from './TaskDispatcher';
 import {browserHistory as history} from 'react-router';
 

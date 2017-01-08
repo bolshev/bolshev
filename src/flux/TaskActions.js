@@ -1,7 +1,7 @@
-import TaskActionTypes from './ActionsTypes';
+import TaskActionTypes from './TaskActionTypes';
 import TaskDispatcher from './TaskDispatcher';
 
-const Actions = {
+const TaskActions = {
     loadTasks() {
         TaskDispatcher.dispatch({
             type: TaskActionTypes.LOAD_TASKS,
@@ -56,4 +56,4 @@ const Actions = {
     },
 };
 
-export default Actions;
+export default TaskActions;

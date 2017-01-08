@@ -3,7 +3,7 @@ import {browserHistory as history} from 'react-router';
 import './css/Task.css';
 import Server from './Server';
 import TaskStore from './flux/TaskStore';
-import TaskActions from './flux/Actions';
+import TaskActions from './flux/TaskActions';
 import SelectCategory from './SelectCategory';
 import History from './History';
 

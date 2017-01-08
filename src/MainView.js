@@ -1,4 +1,5 @@
 import React from 'react';
+import {connect} from 'react-redux'
 import Progress from 'react-progressbar';
 import './css/App.css';
 import './css/Category.css';
@@ -14,8 +15,8 @@ class MainView extends React.Component {
     componentWillMount() {
         TaskStore.fetchTasks();
         let data = {
-            filter: Server.loadFilter(this.props.location.query),
-            categories: Server.getAllCategories()
+            filter: this.props.filter,
+            categories: this.props.categories
         };
 
         data.tasks = [];
@@ -165,4 +166,11 @@ class MainView extends React.Component {
     }
 }
 
-export default MainView;
+function mapStateToProps(state) {
+    return {
+        filter: state.filters,
+        categories: state.categories
+    }
+}
+
+export default connect(mapStateToProps)(MainView)

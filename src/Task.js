@@ -1,6 +1,6 @@
 import React from 'react';
 import './css/Task.css';
-import TaskActions from './flux/Actions';
+import TaskActions from './flux/TaskActions';
 
 class Task extends React.Component {
     constructor(props) {
