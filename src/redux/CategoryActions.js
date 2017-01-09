@@ -1,58 +1,50 @@
-import CategoryActionTypes from './CategoryActionTypes';
+import {CategoryActionTypes} from './ActionTypes';
 
-const CategoryActions = {
-    loadTasks() {
-        return {
-            type: CategoryActionTypes.LOAD_CATEGORIES,
+export function loadCategories() {
+    return {
+        type: CategoryActionTypes.LOAD_CATEGORIES,
+    }
+}
+
+export function addCategory(category) {
+    return {
+        type: CategoryActionTypes.ADD_CATEGORY,
+        data: {
+            category
+        },
+    }
+}
+
+export function editCategory(id) {
+    return {
+        type: CategoryActionTypes.EDIT_CATEGORY,
+        data: {
+            key: id
+        },
+    }
+}
+
+export function cancelEditCategory() {
+    return {
+        type: CategoryActionTypes.CANCEL_EDIT_CATEGORY,
+    }
+}
+
+export function deleteCategory(id) {
+    return {
+        type: CategoryActionTypes.DELETE_CATEGORY,
+        data: {
+            key: id,
         }
-    },
+    }
+}
 
-    addTask(task) {
-        return {
-            type: CategoryActionTypes.ADD_CATEGORY,
-            data: {
-                task
-            },
-        }
-    },
+export function updateCategory(category) {
+    return {
+        type: CategoryActionTypes.UPDATE_CATEGORY,
+        data: {
+            category
+        },
+    }
+}
 
-    editTask(id) {
-        return {
-            type: CategoryActionTypes.EDIT_CATEGORY,
-            data: {
-                key: id
-            },
-        }
-    },
-
-    cancelEditTask() {
-        return {
-            type: CategoryActionTypes.CANCEL_EDIT_CATEGORY,
-        }
-    },
-
-    toggleTask(id, isDone) {
-        return {
-            type: CategoryActionTypes.TOGGLE_CATEGORY,
-            data: {
-                key: id,
-                isDone: isDone
-            }
-        }
-    },
-
-    updateTask(task) {
-        if (!task.key) {
-            return this.addTask(task);
-        } else {
-            return {
-                type: CategoryActionTypes.UPDATE_CATEGORY,
-                data: {
-                    task
-                },
-            }
-        }
-    },
-};
-
-export default CategoryActions;

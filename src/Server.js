@@ -227,7 +227,7 @@ class Server {
         // eslint-disable-next-line
         for (let [k, cat] of Object.entries(this._data.categories)) {
             if (!cat.categoryKey) {
-                cat.selected = this.filter.selectedCategories.includes(cat.key);
+                cat.selected = this.filters.selectedCategories.includes(cat.key);
                 categories.push(cat);
             }
         }
@@ -239,7 +239,7 @@ class Server {
             // eslint-disable-next-line
             for (let [k, child] of Object.entries(this._data.categories)) {
                 if (child.categoryKey === parent.key) {
-                    child.selected = this.filter.selectedCategories.includes(child.key);
+                    child.selected = this.filters.selectedCategories.includes(child.key);
                     parent.children.push(child);
                 }
             }
@@ -354,6 +354,7 @@ class Server {
         category = {
             key: category.key,
             title: category.title,
+            order: category.order,
             isCompleted: category.isCompleted,
             categoryKey: category.categoryKey
         };
@@ -389,38 +390,38 @@ class Server {
         return parseInt((completed / Object.keys(this._data.categories).length) * 100, 10);
     }
 
-    saveFilter(filter, isReplace) {
-        this.filter = filter;
-        localStorage.setItem("filter", JSON.stringify(filter));
+    saveFilters(filters, isReplace) {
+        this.filters = filters;
+        localStorage.setItem("filters", JSON.stringify(filters));
 
-        isReplace ? history.replace("/" + this.getFilter()) : history.push("/" + this.getFilter());
+        isReplace ? history.replace("/" + this.getFilters()) : history.push("/" + this.getFilters());
     }
 
     loadFilter(query) {
-        let filter = query && Object.keys(query).length !== 0 ? query : localStorage.getItem("filter");
-        if (!filter || filter === "undefined") {
-            filter = {
+        let filters = query && Object.keys(query).length !== 0 ? query : localStorage.getItem("filters");
+        if (!filters || filters === "undefined") {
+            filters = {
                 showDone: false,
                 selectedCategories: [],
                 fText: ""
             };
-        } else if (typeof filter === "string") {
-            filter = JSON.parse(filter);
+        } else if (typeof filters === "string") {
+            filters = JSON.parse(filters);
         } else {
-            filter.selectedCategories = filter.selectedCategories ? filter.selectedCategories.split(",") : [];
-            filter.showDone = (filter.showDone === "true");
-            filter.fText = filter.fText || "";
+            filters.selectedCategories = filters.selectedCategories ? filters.selectedCategories.split(",") : [];
+            filters.showDone = (filters.showDone === "true");
+            filters.fText = filters.fText || "";
         }
 
-        this.filter = filter;
-        localStorage.setItem("filter", JSON.stringify(filter));
-        return filter;
+        this.filters = filters;
+        localStorage.setItem("filters", JSON.stringify(filters));
+        return filters;
     }
 
-    getFilter() {
-        let query = "?showDone=" + this.filter.showDone + "&fText=" + this.filter.fText + "&selectedCategories=";
+    getFilters() {
+        let query = "?showDone=" + this.filters.showDone + "&fText=" + this.filters.fText + "&selectedCategories=";
         // eslint-disable-next-line
-        for (let cat of this.filter.selectedCategories) {
+        for (let cat of this.filters.selectedCategories) {
             query = query + cat + ",";
         }
 

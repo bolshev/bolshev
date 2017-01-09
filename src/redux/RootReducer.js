@@ -1,51 +1,55 @@
 import {combineReducers} from 'redux';
 import Server from '../Server'
-import {CategoryActionTypes, FilterActionTypes} from './CategoryActionTypes'
+import {CategoryActionTypes, FilterActionTypes} from './ActionTypes'
+import {parse as queryParse} from 'query-string';
 
 const initialStateCategories = Server.getAllCategories();
 
-// ??? query
-const initialStateFilters = Server.loadFilter();
+const initialStateFilters = Server.loadFilter(queryParse(location.search));
 
-function reducerCategories(state = initialStateCategories, action) {
+function reducerCategories(categories = initialStateCategories, action) {
     switch (action.type) {
+        case CategoryActionTypes.LOAD_CATEGORIES:
+            return Server.getAllCategories();
         case CategoryActionTypes.ADD_CATEGORY:
-            return action.filter;
+            return Server.updateCategory(action.data.category);
+        case CategoryActionTypes.CANCEL_EDIT_CATEGORY:
+            return categories;
+        case CategoryActionTypes.DELETE_CATEGORY:
+            return Server.deleteCategory(action.data.key);
+        case CategoryActionTypes.EDIT_CATEGORY:
+            return categories;
+        case CategoryActionTypes.UPDATE_CATEGORY:
+            return Server.updateCategory(action.data.category);
         default:
-            return state;
+            return categories;
     }
 }
 
-function reducerFilters(state = initialStateFilters, action) {
+function reducerFilters(filters = initialStateFilters, action) {
     switch (action.type) {
-        case FilterActionTypes.LOAD_FILTER:
-            return [
-                ...state,
-                {
-                    text: action.text,
-                    completed: false
-                }
-            ];
+        case FilterActionTypes.LOAD_FILTERS:
+            return Server.loadFilter(queryParse(location.search));
         case FilterActionTypes.GET_QUERY:
-            return state.map((todo, index) => {
-                if (index === action.index) {
-                    return Object.assign({}, todo, {
-                        completed: !todo.completed
-                    })
+            return Server.getFilters();
+        case FilterActionTypes.SELECT_CATEGORY:
+            if (action.data.flag) {
+                filters.selectedCategories.push(action.data.key);
+            } else {
+                let index = filters.selectedCategories.indexOf(action.data.key);
+                if (index > -1) {
+                    filters.selectedCategories.splice(index, 1);
                 }
-                return todo;
-            });
-        case FilterActionTypes.SAVE_FILTER:
-            return state.map((todo, index) => {
-                if (index === action.index) {
-                    return Object.assign({}, todo, {
-                        completed: !todo.completed
-                    })
-                }
-                return todo;
-            });
+            }
+            Server.saveFilters(filters);
+
+            return filters;
+        case FilterActionTypes.UPDATE_QUERY:
+        case FilterActionTypes.SAVE_FILTERS:
+            Server.saveFilters(action.data.filters, action.data.isReplace);
+            return Server.loadFilter();
         default:
-            return state
+            return filters;
     }
 }
 

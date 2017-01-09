@@ -15,7 +15,7 @@ class SelectCategory extends Component {
     }
 
     handleCollapseExpandClick(e) {
-        console.log("Category:handleCollapseExpandClick");
+        console.log("CategoryContainer:handleCollapseExpandClick");
         let state = this.state;
         state.showChildren = !this.state.showChildren;
         state.showChildren ? e.target.innerHTML = "^" : e.target.innerHTML = ">";

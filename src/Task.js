@@ -5,7 +5,7 @@ import TaskActions from './flux/TaskActions';
 class Task extends React.Component {
     constructor(props) {
         super(props);
-        this.showDone = props.filter.showDone;
+        this.showDone = props.filters.showDone;
         this.state = props.data;
     }
 
@@ -23,7 +23,7 @@ class Task extends React.Component {
     }
 
     render() {
-        if ((!this.props.filter.showDone && this.state.isDone) || this.state.title.indexOf(this.props.filter.fText) === -1) {
+        if ((!this.props.filters.showDone && this.state.isDone) || this.state.title.indexOf(this.props.filters.fText) === -1) {
             return (null);
         } else {
             return (

@@ -6,7 +6,7 @@ import configureStore from './redux/CreateStore'
 import App from './App';
 import EditTask from './EditTask';
 import EditCategory from './EditCategory';
-import MainView from './MainView';
+import MainView from './MainContainer';
 import NotFound from './NotFound';
 import './css/index.css';
 
