@@ -300,7 +300,7 @@ class Server {
     updateTask(task) {
         this.load();
         if (!task.key) {
-            task.key = "t" + this.getRandomTaskKey();
+            task.key = `t${this.getRandomTaskKey()}`;
             this.updateTasksOrder();
             task.order = 1;
         }
@@ -316,7 +316,7 @@ class Server {
     getRandomTaskKey() {
         this.load();
         let num = this.getRandomInt();
-        if (this._data.tasks["t" + num]) {
+        if (this._data.tasks[`t${num}`]) {
             num = this.getRandomTaskKey();
         }
         return num;
@@ -325,7 +325,7 @@ class Server {
     getRandomCategoryKey() {
         this.load();
         let num = this.getRandomInt();
-        if (this._data.categories["cat" + num]) {
+        if (this._data.categories[`cat${num}`]) {
             num = this.getRandomTaskKey();
         }
         return num;
@@ -346,7 +346,7 @@ class Server {
     updateCategory(category) {
         this.load();
         if (!category.key) {
-            category.key = "cat" + this.getRandomCategoryKey();
+            category.key = `cat${this.getRandomCategoryKey()}`;
             this.updateCategoriesOrder();
             category.order = 1;
         }
@@ -419,7 +419,7 @@ class Server {
     }
 
     getFilters() {
-        let query = "?showDone=" + this.filters.showDone + "&fText=" + this.filters.fText + "&selectedCategories=";
+        let query = `?showDone=${this.filters.showDone}&fText=${this.filters.fText}&selectedCategories=`;
         // eslint-disable-next-line
         for (let cat of this.filters.selectedCategories) {
             query = query + cat + ",";

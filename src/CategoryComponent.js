@@ -13,12 +13,12 @@ class CategoryComponent extends React.Component {
 
     handleAddCategoryClick(e) {
         console.log("CategoryComponent:handleAddCategoryClick");
-        history.push("/category/" + this.props.key + "/add");
+        history.push(`/category/${this.props.key}/add`);
     }
 
     handleEditClick() {
         console.log("CategoryComponent:handleEditClick");
-        history.push("/category/" + this.props.key)
+        history.push(`/category/${this.props.key}`)
     }
 
     handleCollapseExpandClick(e) {
