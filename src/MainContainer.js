@@ -24,6 +24,7 @@ class MainContainer extends React.Component {
     }
 
     componentDidMount() {
+        this.onChange();
         let state = this.state;
         state.tasks = this.filterTasksByCategories(TaskStore.getTasks(), this.props.filters);
         this.setState(state);

@@ -1,15 +1,17 @@
 import {CategoryActionTypes} from './ActionTypes';
+import Server from '../Server'
 
-export function loadCategories() {
+export function loadCategories(withTasks) {
     return {
         type: CategoryActionTypes.LOAD_CATEGORIES,
+        payload: Server.getAllCategoriesPromise(withTasks),
     }
 }
 
 export function addCategory(category) {
     return {
         type: CategoryActionTypes.ADD_CATEGORY,
-        data: {
+        payload: {
             category
         },
     }
@@ -18,7 +20,7 @@ export function addCategory(category) {
 export function editCategory(id) {
     return {
         type: CategoryActionTypes.EDIT_CATEGORY,
-        data: {
+        payload: {
             key: id
         },
     }
@@ -33,7 +35,7 @@ export function cancelEditCategory() {
 export function deleteCategory(id) {
     return {
         type: CategoryActionTypes.DELETE_CATEGORY,
-        data: {
+        payload: {
             key: id,
         }
     }
@@ -42,8 +44,17 @@ export function deleteCategory(id) {
 export function updateCategory(category) {
     return {
         type: CategoryActionTypes.UPDATE_CATEGORY,
-        data: {
+        payload: {
             category
+        },
+    }
+}
+
+export function updateCategoryFinished(withTasks) {
+    return {
+        type: CategoryActionTypes.LOAD_CATEGORIES_FINISHED,
+        payload: {
+            withTasks
         },
     }
 }

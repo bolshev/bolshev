@@ -215,6 +215,16 @@ class Server {
         if (a.order < b.order) return -1;
     }
 
+    getAllCategoriesPromise(withTasks = true) {
+        return new Promise(function (resolve, reject) {
+            this.load();
+            this.loadFilter();
+            setTimeout(function () {
+                resolve(withTasks)
+            }, 5000);
+        }.bind(this));
+    }
+
     getAllCategories() {
         return this.getAllCategoriesWithTasks(false);
     }
